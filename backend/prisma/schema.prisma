@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  
+}
+
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  token String
+  password String
+  films UsersOnFilms[]
+}
+
+model Film{
+  id              Int     @id @default(autoincrement())
+  name_russian	  String
+  year	          Int?
+  rating_kp	      Int? 
+  rating_imdb	    Int?
+  age_restriction	Int?
+  description	    String
+  slogan          String?
+  small_poster    String?	
+  big_poster	    String?
+  genres          String?
+  countries       String?
+  users           UsersOnFilms[]
+
+
+  @@fulltext([name_russian])
+  @@fulltext([name_russian, description])
+  @@fulltext([genres])
+  @@fulltext([name_russian, description, genres])
+}
+
+model UsersOnFilms{
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int 
+  film       Film     @relation(fields: [filmId], references: [id])
+  filmId     Int 
+  like Boolean
+  @@id([userId, filmId])
+}
+
+// model Post {
+//   id        Int     @id @default(autoincrement())
+//   title     String
+//   content   String?
+//   published Boolean @default(false)
+//   author    User    @relation(fields: [authorId], references: [id])
+//   authorId  Int
+// }
